@@ -1,0 +1,17 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "damagetracker"
+version = "${version}"
+displayName = "DamageTracker"
+authors = "Kall"
+description = '''
+A Minecraft mod
+'''
+#logoFile = ""
+
+[[mixins]]
+config = "damagetracker.mixins.json"
