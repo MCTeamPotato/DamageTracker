@@ -39,6 +39,12 @@ public abstract class DeathScreenMixin extends Screen {
         }
     }
 
+    @Inject(method = "setButtonsActive", at = @At("HEAD"))
+    private void onActivate(boolean active, CallbackInfo ci) {
+        if (this.death$reasonButton == null) return;
+        this.death$reasonButton.active = active;
+    }
+
     @Inject(method = "render", at = @At("TAIL"))
     private void renderDeathReasons(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (this.death$reasonButton != null && this.death$reasonButton.isHovered()) {
