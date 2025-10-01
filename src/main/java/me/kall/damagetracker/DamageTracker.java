@@ -6,9 +6,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +38,8 @@ public final class DamageTracker {
         }
     };
 
-    public DamageTracker() {
-        MinecraftForge.EVENT_BUS.addListener(DamageTracker::onTick);
+    public DamageTracker(IEventBus modBus, Dist dist, ModContainer container) {
+        NeoForge.EVENT_BUS.addListener(DamageTracker::onTick);
     }
 
     public static void update(@NotNull DamageSource damageSource, float amount, UUID victimUuid) {
@@ -70,9 +73,9 @@ public final class DamageTracker {
         });
     }
 
-    public static void onTick(TickEvent.@NotNull ServerTickEvent event) {
+    public static void onTick(ServerTickEvent.@NotNull Pre event) {
         event.getServer().execute(() -> {
-            if (event.phase.equals(TickEvent.Phase.END) && !DAMAGES.isEmpty()) CLEAN.run();
+            if (!DAMAGES.isEmpty()) CLEAN.run();
         });
     }
 

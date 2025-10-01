@@ -31,7 +31,7 @@ public abstract class DeathScreenMixin extends Screen {
     @Inject(method = "init", at = @At("TAIL"))
     private void addButton(CallbackInfo ci) {
         if (!this.exitButtons.isEmpty()) {
-            Button respawnButton = this.exitButtons.get(0);
+            Button respawnButton = this.exitButtons.getFirst();
 
             this.death$reasonButton = Button.builder(Component.translatable("button.damage_tracker"), button -> {}).bounds(respawnButton.getX(), respawnButton.getY() - 24, respawnButton.getWidth(), 20).build();
             this.death$reasonButton.active = false;
