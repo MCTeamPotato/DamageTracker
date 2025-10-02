@@ -53,7 +53,6 @@ public final class DamageTracker {
         DAMAGES.computeIfAbsent(victimUuid, key -> new ObjectArrayList<>()).add(new TimestampedDamage(damageSource, amount, now(), attackerUuid, directUuid));
     }
 
-
     public static @NotNull Iterator<TimestampedDamage> getDamages(UUID uuid) {
         List<TimestampedDamage> damages = DAMAGES.get(uuid);
         if (damages == null) return Collections.emptyIterator();

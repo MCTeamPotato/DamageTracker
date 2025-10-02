@@ -1,5 +1,6 @@
 package me.kall.damagetracker.mixin;
 
+import com.google.common.collect.Lists;
 import me.kall.damagetracker.DamageTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -14,18 +15,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen {
     @Shadow @Final private List<Button> exitButtons;
 
     @Unique private Button death$reasonButton;
+    @Unique private List<DamageTracker.TimestampedDamage> death$reasons;
 
     protected DeathScreenMixin(Component title) {
         super(title);
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void init(CallbackInfo ci) {
+        if (this.minecraft != null && this.minecraft.player != null) {
+            this.death$reasons = Lists.newArrayList(DamageTracker.getDamages(this.minecraft.player.getUUID()));
+        }
     }
 
     @Inject(method = "init", at = @At("TAIL"))
@@ -49,15 +56,13 @@ public abstract class DeathScreenMixin extends Screen {
     private void renderDeathReasons(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (this.death$reasonButton != null && this.death$reasonButton.isHovered()) {
             if (this.minecraft != null && this.minecraft.player != null) {
-                UUID uuid = this.minecraft.player.getUUID();
-                Iterator<DamageTracker.TimestampedDamage> damages = DamageTracker.getDamages(uuid);
+                if (this.death$reasons == null) this.death$reasons = Lists.newArrayList(DamageTracker.getDamages(this.minecraft.player.getUUID()));
                 int startX = this.width - 150;
                 int startY = 60;
                 int lineHeight = 10;
 
                 int i = 0;
-                while (damages.hasNext()) {
-                    DamageTracker.TimestampedDamage dmg = damages.next();
+                for (DamageTracker.TimestampedDamage dmg : this.death$reasons) {
                     String text = String.format("%s: %.1f", dmg.getDisplayText().getString(), dmg.amount());
                     guiGraphics.drawString(this.font, text, startX, startY + i * lineHeight, 0xFFFFFF, false);
                     i++;
